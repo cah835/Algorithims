@@ -10,30 +10,19 @@
 #include <cstdlib>
 using namespace std;
 
+//set up counters to determine whats faster
+int Mem_count = 0;
+int BU_count = 0;
+int C_count = 0;
 
 //memoization algorithim
-int MemoSort(int n, int k, int** Narray)
+int Memoization(int n, int k, int** Narray)
 {
-   // cout << Narray[n][k] << endl;
-    for(int i=1; i<n+1; i++)
+    if(Narray[n][k] == -1)
     {
-        for(int j=0; j<k+1; j++)
-        {
-            //set base cases
-            if(j == 0 || j == i)
-            {
-                Narray[i][j] = 1;
-            }
-            else
-            {
-                Narray[i][j] = Narray[i-1][j] + Narray[i-1][j-1];
-            }
-        }//end of nested loop
-    }//end of for loop
-
-    //print Memo
-    cout << "the output for Memoization array is " << endl;
-    cout << Narray[n][k] << endl;
+    Mem_count++;
+    Narray[n][k] = Memoization(n-1, k, Narray) + Memoization(n-1, k-1, Narray);
+    }
     return Narray[n][k];
 }// end of MemoSort
 
@@ -55,7 +44,18 @@ int Memo(int n, int k)
             Narray[i][j] = -1;
         }
     }
-    return MemoSort(n,k, Narray);
+    for(int i=0; i<n+1; i++)
+    {
+        for(int j=0; j<k+1; j++)
+        {
+            //set base cases
+            if(j == 0 || j == i)
+            {
+                Narray[i][j] = 1;
+            }
+        }//end of nested loop
+    }//end of for loop
+    return Memoization(n,k, Narray);
 }//end of Memo
 
 int Bottom_up(int n, int k)
@@ -78,14 +78,25 @@ int Bottom_up(int n, int k)
             else
             {
             BU_array[i][j] = BU_array[i-1][j] + BU_array[i-1][j-1];
+            BU_count++;
             }
         }// end of for loop
     }
-    //print the answer
-    cout << "the output for Bottom_up array is " << endl;
-    cout << BU_array[n][k] << endl;
     return BU_array[n][k];
 }// end of bottom up
+
+int C(int n, int k)
+{
+    if(k== 0 || k==n)
+    {
+        return 1;
+    }
+    else
+    {
+        C_count++;
+        return C(n-1,k) + C(n-1,k-1);
+    }
+}
 
 //main function that will set N and K and then call the different algorithims
 int main()
@@ -97,9 +108,26 @@ int main()
     cin >> n;
     cout<< "what value do you want to set K at? "<< endl;
     cin >> k;
-    //set value
-    //call Memo
-    Memo(n,k);
-    Bottom_up(n,k);
+    cout << endl;
+    //call the functions
+    int Memo_answer = Memo(n,k);
+    int BU_answer = Bottom_up(n,k);
+    int C_answer = C(n,k);
+    
+    //print the results for Memoization
+    cout << "the output for Memoization array is " << Memo_answer << endl;
+    cout << Mem_count << " subproblems solved" << endl;
+    cout << endl;
+    
+    //print the result for Bottom Up
+    cout << "the output for Bottom_up array is " << BU_answer << endl;
+    cout << BU_count << " sub problems solved" << endl;
+    cout << endl;
+    
+    //print the result for C function provided
+    cout << "the output for Recursive array is " << C_answer << endl;
+    cout << C_count << " sub problems solved" << endl;
+    cout << endl;
+    
     return 0;
 }//end of main
